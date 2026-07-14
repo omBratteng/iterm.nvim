@@ -6,6 +6,7 @@ local default_config = {
   tab_color = false,
   badge = false,
   background_image = false,
+  name = false,
 
   auto_reset = true,
 
@@ -13,6 +14,7 @@ local default_config = {
   reset_tab_color = false,
   reset_badge = false,
   reset_background_image = false,
+  reset_name = false,
 }
 
 local M = {}
@@ -24,6 +26,7 @@ M.setup = function(opts)
   if config.tab_color ~= false then M.set_tab_color(config.tab_color) end
   if config.badge ~= false then M.set_badge(config.badge) end
   if config.background_image ~= false then M.set_background_image(config.background_image) end
+  if config.name ~= false then M.set_name(config.name) end
 
   if config.auto_reset and aucmd == nil then
     aucmd = vim.api.nvim_create_autocmd("VimLeave", {
@@ -31,7 +34,8 @@ M.setup = function(opts)
         if config.reset_profile ~= false then M.set_profile(config.reset_profile) end
         if config.reset_tab_color then M.set_tab_color(config.reset_tab_color) end
         if config.reset_badge then M.set_badge(config.reset_badge) end
-        if config.reset_background_image then M.set_badge(config.reset_background_image) end
+        if config.reset_background_image then M.set_background_image(config.reset_background_image) end
+        if config.reset_name then M.set_name(config.reset_name) end
       end,
     })
   elseif not config.auto_reset and aucmd ~= nil then
@@ -42,6 +46,13 @@ end
 
 M.set_profile = function(name)
   io.write("\x1b]1337;SetProfile=" .. name .. "\x07")
+end
+
+-- Sets the window and tab/icon title using the standard OSC 2 sequence. The
+-- profile setting "Terminal may set tab/window title" must be enabled. Note the
+-- shell prompt may overwrite this on subsequent commands.
+M.set_name = function(name)
+  io.write("\x1b]0;" .. name .. "\x07")
 end
 
 M.set_badge = function(format)
